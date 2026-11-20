@@ -1,0 +1,55 @@
+<style>
+.as-fab{position:fixed;right:22px;bottom:22px;z-index:90;width:58px;height:58px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:1.35rem;
+  background:linear-gradient(135deg,#6d28d9,#8b5cf6 50%,#22d3ee);box-shadow:0 12px 36px rgba(139,92,246,.55),inset 0 1px 0 rgba(255,255,255,.4);transition:.25s;
+  display:grid;place-items:center}
+.as-fab:hover{transform:translateY(-3px) scale(1.06)}
+[dir=rtl] .as-fab{right:auto;left:22px}
+.as-box{position:fixed;right:22px;bottom:92px;z-index:91;width:min(380px,calc(100vw - 32px));height:min(540px,calc(100vh - 130px));display:flex;flex-direction:column;
+  background:rgba(12,8,32,.92);backdrop-filter:blur(22px);border:1px solid rgba(139,92,246,.35);border-radius:22px;box-shadow:0 40px 90px rgba(0,0,0,.6);
+  opacity:0;pointer-events:none;transform:translateY(16px) scale(.97);transition:.3s;font-family:'Sora','Cairo',sans-serif;color:#eef0ff;overflow:hidden}
+[dir=rtl] .as-box{right:auto;left:22px}
+.as-box.open{opacity:1;pointer-events:auto;transform:none}
+.as-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(139,92,246,.25);font-weight:700}
+.as-h .d{width:9px;height:9px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399}
+.as-h button{margin-inline-start:auto;background:none;border:0;color:#9aa0c8;font-size:1.1rem;cursor:pointer}
+.as-m{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:.86rem;line-height:1.6}
+.as-b{max-width:88%;padding:10px 13px;border-radius:15px;white-space:pre-wrap;word-wrap:break-word}
+.as-b.bot{background:rgba(139,92,246,.16);border:1px solid rgba(139,92,246,.25);align-self:flex-start;border-bottom-left-radius:4px}
+.as-b.me{background:linear-gradient(135deg,#6d28d9,#0891b2);align-self:flex-end;border-bottom-right-radius:4px}
+.as-b code{background:rgba(0,0,0,.35);padding:1px 5px;border-radius:5px;font-family:'JetBrains Mono',monospace;font-size:.8rem}
+.as-f{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(139,92,246,.25)}
+.as-f input{flex:1;background:rgba(5,3,20,.7);border:1px solid rgba(139,92,246,.25);border-radius:12px;padding:11px 13px;color:#fff;font:inherit;font-size:.85rem}
+.as-f input:focus{outline:none;border-color:#22d3ee}
+.as-f button{border:0;border-radius:12px;padding:0 16px;color:#fff;font-weight:700;cursor:pointer;background:linear-gradient(120deg,#6d28d9,#22d3ee)}
+.as-f button:disabled{opacity:.5}
+.as-n{font-size:.7rem;color:#6a6f99;text-align:center;padding:0 12px 8px}
+</style>
+<button class="as-fab" id="asFab" aria-label="Assist"><i class="fas fa-comment-dots"></i></button>
+<div class="as-box" id="asBox" data-noi18n-root>
+  <div class="as-h"><span class="d"></span><span>Assist</span><button id="asClose" aria-label="Close">&times;</button></div>
+  <div class="as-m" id="asMsgs"><div class="as-b bot">Hi! I can help with deployments, errors and choosing a VPS plan.</div></div>
+  <div class="as-n" id="asNote"></div>
+  <form class="as-f" id="asForm"><input id="asIn" autocomplete="off" placeholder="Ask about hosting, deployments or VPS…"><button id="asSend" type="submit">Send</button></form>
+</div>
+<script>
+(function(){
+  var logged={{ 'true' if session.get('user') else 'false' }}, hist=[], busy=false;
+  var $=function(i){return document.getElementById(i)}, T=function(s){return window.t?window.t(s):s};
+  $('asFab').onclick=function(){$('asBox').classList.toggle('open');if($('asBox').classList.contains('open'))$('asIn').focus();};
+  $('asClose').onclick=function(){$('asBox').classList.remove('open')};
+  function esc(s){return s.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+  function fmt(s){return esc(s).replace(/`([^`]+)`/g,'<code>$1</code>')}
+  function add(cls,txt){var d=document.createElement('div');d.className='as-b '+cls;d.innerHTML=fmt(txt);$('asMsgs').appendChild(d);$('asMsgs').scrollTop=1e9;return d}
+  var cid='c'+Math.random().toString(36).slice(2,12);
+  $('asForm').onsubmit=async function(e){
+    e.preventDefault(); if(busy)return; var q=$('asIn').value.trim(); if(!q)return;
+    $('asIn').value=''; add('me',q); busy=true; $('asSend').disabled=true; var w=add('bot','…'),acc='';
+    try{
+      var r=await fetch('/api/assistant/stream',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,chat_id:cid})});
+      if(!r.ok){var j=await r.json();w.textContent=j.error||'Error';}
+      else{var rd=r.body.getReader(),dc=new TextDecoder();for(;;){var x=await rd.read();if(x.done)break;acc+=dc.decode(x.value,{stream:true});w.innerHTML=fmt(acc);$('asMsgs').scrollTop=1e9;}}
+    }catch(err){w.textContent='Connection error';}
+    busy=false;$('asSend').disabled=false;$('asMsgs').scrollTop=1e9;
+  };
+})();
+</script>

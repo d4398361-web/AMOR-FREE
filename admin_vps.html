@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>VPS Accounts | AMOR Admin</title>
+{% include '_head.html' %}
+<style>
+.pg{max-width:1300px;margin:0 auto;padding:34px 5vw 80px}
+.pg h1{font-size:2rem;margin:0 0 6px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:22px 0}
+.stat{padding:18px 20px}.stat b{display:block;font-size:1.8rem}.stat span{font-size:.72rem;color:var(--mute);letter-spacing:.12em;text-transform:uppercase}
+.form{padding:26px;margin-bottom:26px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.tw{overflow-x:auto;padding:8px 14px 16px}
+table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:1050px}
+th{color:var(--mute);font-weight:600;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;text-align:left;padding:12px 8px}
+td{padding:9px 8px;border-top:1px solid var(--line);vertical-align:middle}
+td .field{padding:8px 10px;font-size:.8rem;border-radius:10px}
+.sm{padding:8px 13px;font-size:.78rem;border-radius:10px}
+.b-Active{color:#6ee7b7}.b-Pending{color:#fcd34d}.b-Suspended{color:#fda4af}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99;padding:12px 20px;border-radius:12px}
+</style>
+</head>
+<body class="amor">
+<div id="scene"></div>
+<nav class="nav"><a class="brand" href="/"><img src="/static/logo.jpg" alt=""> AMOR <span class="grad">ADMIN</span></a>
+  <div class="links"><a class="l" href="/admin">Servers</a><a class="l" href="/vps">VPS page</a><a class="l" href="/logout">Logout</a></div></nav>
+<main class="pg">
+  <h1>VPS <span class="grad">Accounts</span></h1>
+  <p class="lead">Create a VPS account for anyone, or manage the requests that come in. Active accounts show their login details to the owner on the VPS page.</p>
+  <div class="stats">
+    <div class="glass stat"><b class="grad">{{ orders|length }}</b><span>Total</span></div>
+    <div class="glass stat"><b style="color:#fcd34d">{{ orders|selectattr('status','equalto','Pending')|list|length }}</b><span>Pending</span></div>
+    <div class="glass stat"><b style="color:#6ee7b7">{{ orders|selectattr('status','equalto','Active')|list|length }}</b><span>Active</span></div>
+    <div class="glass stat"><b style="color:#fda4af">{{ orders|selectattr('status','equalto','Suspended')|list|length }}</b><span>Suspended</span></div>
+  </div>
+
+  <div class="glass form">
+    <h3 style="margin:0 0 16px">+ Create VPS account</h3>
+    <div class="fg">
+      <div><label class="lb">Customer name *</label><input id="c_name" class="field" placeholder="Full name"></div>
+      <div><label class="lb">Email</label><input id="c_email" class="field" placeholder="name@mail.com"></div>
+      <div><label class="lb">Contact</label><input id="c_contact" class="field" placeholder="WhatsApp / Telegram"></div>
+      <div><label class="lb">Link to site user</label>
+        <select id="c_user" class="field"><option value="">(none)</option>{% for u in users %}<option>{{ u }}</option>{% endfor %}</select></div>
+      <div><label class="lb">Plan</label><select id="c_plan" class="field">{% for p in vps_plans %}<option value="{{ p.id }}">{{ p.name }} - {{ p.cpu }}vCPU / {{ p.ram }}GB / ${{ p.price }}</option>{% endfor %}</select></div>
+      <div><label class="lb">OS</label><select id="c_os" class="field">{% for o in vps_os %}<option>{{ o }}</option>{% endfor %}</select></div>
+      <div><label class="lb">Region</label><select id="c_region" class="field">{% for r in vps_regions %}<option>{{ r }}</option>{% endfor %}</select></div>
+      <div><label class="lb">Months</label><input id="c_months" class="field" type="number" min="1" max="36" value="1"></div>
+      <div><label class="lb">IP address</label><input id="c_ip" class="field mono" placeholder="203.0.113.10"></div>
+      <div><label class="lb">SSH user</label><input id="c_sshu" class="field mono" value="root"></div>
+      <div><label class="lb">Password</label><input id="c_sshp" class="field mono" value="{{ gen_pass }}"></div>
+      <div><label class="lb">Status</label><select id="c_status" class="field"><option>Active</option><option>Pending</option><option>Suspended</option></select></div>
+    </div>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-p" onclick="createVps()"><i class="fas fa-server"></i> Create account</button>
+      <button class="btn btn-g" onclick="document.getElementById('c_sshp').value=rp()"><i class="fas fa-dice"></i> New password</button>
+    </div>
+  </div>
+
+  <div class="glass tw">
+    <table>
+      <tr><th>ID</th><th>Customer</th><th>Plan</th><th>OS / Region</th><th>Site user</th><th>IP</th><th>SSH user</th><th>Password</th><th>Expires</th><th>Status</th><th></th></tr>
+      {% for o in orders %}
+      <tr data-id="{{ o.id }}">
+        <td class="mono">{{ o.id }}</td>
+        <td><b>{{ o.name }}</b><br><span style="color:var(--mute)">{{ o.email }} {{ o.contact }}</span></td>
+        <td>{{ o.plan_name }}<br><span style="color:var(--mute)">${{ o.total }}</span></td>
+        <td>{{ o.os }}<br><span style="color:var(--mute)">{{ o.region }}</span></td>
+        <td><input class="field" data-k="user" value="{{ o.user or '' }}" style="width:100px"></td>
+        <td><input class="field mono" data-k="ip" value="{{ o.ip or '' }}" style="width:130px"></td>
+        <td><input class="field mono" data-k="ssh_user" value="{{ o.ssh_user or '' }}" style="width:80px"></td>
+        <td><input class="field mono" data-k="ssh_password" value="{{ o.ssh_password or '' }}" style="width:140px"></td>
+        <td><input class="field mono" data-k="expires" value="{{ o.expires or '' }}" placeholder="YYYY-MM-DD" style="width:110px"></td>
+        <td><select class="field b-{{ o.status }}" data-k="status" style="width:112px">{% for s in ['Pending','Active','Suspended'] %}<option {{ 'selected' if s==o.status }}>{{ s }}</option>{% endfor %}</select></td>
+        <td style="white-space:nowrap"><button class="btn btn-p sm" onclick="saveRow(this)">Save</button> <button class="btn btn-g sm" onclick="delRow(this)"><i class="fas fa-trash"></i></button></td>
+      </tr>
+      {% else %}<tr><td colspan="11" style="text-align:center;color:var(--mute);padding:30px">No VPS accounts yet.</td></tr>{% endfor %}
+    </table>
+  </div>
+</main>
+<div id="toast" class="toast glass hidden"></div>
+<script>window.SCENE_MODE='auth';</script>
+{% include '_scripts.html' %}
+<script>
+function rp(){var c='abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789',s='';for(var i=0;i<14;i++)s+=c[Math.floor(Math.random()*c.length)];return s}
+function toast(t,ok){var e=document.getElementById('toast');e.textContent=t;e.style.color=ok?'#6ee7b7':'#fda4af';e.classList.remove('hidden');setTimeout(function(){e.classList.add('hidden')},2600)}
+function v(id){return document.getElementById(id).value}
+async function post(u,b){var r=await fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});return r.json()}
+async function createVps(){
+  var d=await post('/api/admin/vps/create',{name:v('c_name'),email:v('c_email'),contact:v('c_contact'),user:v('c_user'),plan:v('c_plan'),os:v('c_os'),region:v('c_region'),months:v('c_months'),ip:v('c_ip'),ssh_user:v('c_sshu'),ssh_password:v('c_sshp'),status:v('c_status')});
+  if(d.ok){toast('Created '+d.order.id,true);setTimeout(function(){location.reload()},900)}else toast(d.error||'Failed',false)
+}
+async function saveRow(b){var tr=b.closest('tr'),body={id:tr.dataset.id};tr.querySelectorAll('[data-k]').forEach(function(i){body[i.dataset.k]=i.value});
+  var d=await post('/api/admin/vps/update',body);toast(d.ok?'Saved':(d.error||'Failed'),d.ok)}
+async function delRow(b){if(!confirm('Delete this VPS account?'))return;var tr=b.closest('tr');var d=await post('/api/admin/vps/update',{id:tr.dataset.id,delete:true});if(d.ok)tr.remove();else toast(d.error||'Failed',false)}
+</script>
+</body>
+</html>

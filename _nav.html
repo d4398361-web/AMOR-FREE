@@ -1,0 +1,22 @@
+<div id="scene"></div>
+<nav class="nav">
+  <a class="brand" href="/"><img src="/static/logo.jpg" alt="AMOR"> AMOR <span class="grad">HOSTING</span></a>
+  <button type="button" class="burger" id="burger" aria-label="Menu"><i class="fas fa-bars"></i></button>
+  <div class="links" id="navLinks">
+    <a class="l" href="/#features">Features</a>
+    <a class="l" href="/#how">How it works</a>
+    <a class="l" href="/vps">VPS</a>
+    {% if session.get('user') %}<a class="l" href="/vps/panel">My VPS</a>{% endif %}
+    {% if session.get('user') %}
+      {% if session.get('current_server_id') %}<a class="btn btn-p" style="padding:9px 18px" href="/{{ session.get('current_server_id') }}/home"><i class="fas fa-gauge-high"></i> Dashboard</a>{% endif %}
+      <a class="l" href="/logout">Logout</a>
+    {% else %}
+      <a class="l" href="/login">Login</a>
+      <a class="l" href="/vps/signup">VPS sign up</a>
+      <a class="btn btn-p" style="padding:9px 18px" href="/register">Get started</a>
+    {% endif %}
+  </div>
+</nav>
+<script>(function(){var b=document.getElementById('burger'),l=document.getElementById('navLinks');if(!b)return;
+b.addEventListener('click',function(e){e.stopPropagation();l.classList.toggle('open')});
+document.addEventListener('click',function(e){if(!l.contains(e.target))l.classList.remove('open')});})();</script>

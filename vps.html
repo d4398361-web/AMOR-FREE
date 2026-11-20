@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>VPS | AMOR HOSTING</title>
+{% include '_head.html' %}
+<style>
+.top{padding:60px 5vw 10px;max-width:1250px;margin:0 auto}
+.top h1{font-size:clamp(2.2rem,5.5vw,4rem);margin:10px 0;line-height:1.05;letter-spacing:-.02em}
+.opt{cursor:pointer;padding:18px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.03);transition:.2s;text-align:left;color:#fff;font-family:inherit;width:100%}
+.opt:hover{border-color:var(--c)} .opt.on{border-color:var(--c);background:linear-gradient(135deg,rgba(139,92,246,.3),rgba(34,211,238,.18));box-shadow:0 0 34px rgba(34,211,238,.2)}
+.opt b{display:block;font-size:1rem}.opt span{font-size:.76rem;color:var(--mute)}.opt .p{font-size:1.3rem;font-weight:800;margin-top:6px}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;max-width:1250px;margin:30px auto 80px;padding:0 5vw}
+.box{padding:28px}.box h3{margin:0 0 16px;font-size:1rem;letter-spacing:.04em}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.sum{position:sticky;top:90px;align-self:start}
+.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed rgba(139,92,246,.2);font-size:.88rem;color:var(--mute)}.row b{color:#fff}
+.total{font-size:2rem;font-weight:800;margin:14px 0 18px}
+.my{max-width:1250px;margin:0 auto 60px;padding:0 5vw}
+.my table{width:100%;border-collapse:collapse;font-size:.85rem}.my th,.my td{padding:12px;text-align:left;border-bottom:1px solid var(--line)}.my th{color:var(--mute);font-weight:600;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase}
+.badge{padding:3px 10px;border-radius:99px;background:rgba(251,191,36,.15);color:#fcd34d;font-size:.72rem}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sum{position:static}}
+</style>
+</head>
+<body class="amor">
+{% include '_nav.html' %}
+<main>
+  <div class="top reveal">
+    <div class="eyebrow">VPS Registration</div>
+    <h1 data-i18n="order_title">Order your <span class="grad">VPS</span></h1>
+    <p class="lead">Choose a plan, system and location, then register. Your server is activated after review.</p>
+  </div>
+
+  {% if not session.get('user') %}<div class="glass box reveal" style="max-width:1150px;margin:20px auto 0;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span>Please sign in to order a VPS.</span><span><a class="btn btn-p" href="/vps/signup">Create VPS account</a> <a class="btn btn-g" href="/login">Sign in</a></span></div>{% endif %}
+  <div class="layout" id="order">
+    <div class="stack">
+      <div class="glass box"><h3>1 · PLAN</h3>
+        <div class="cols">
+          {% for p in vps_plans %}
+          <button type="button" class="opt" data-plan="{{ p.id }}" data-price="{{ p.price }}" data-name="{{ p.name }}">
+            <b>{{ p.name }}</b><span>{{ p.cpu }} vCPU · {{ p.ram }} GB · {{ p.disk }} GB NVMe</span><div class="p grad">${{ p.price }}</div>
+          </button>
+          {% endfor %}
+        </div></div>
+      <div class="glass box"><h3>2 · OPERATING SYSTEM</h3>
+        <div class="cols">
+          {% for o in vps_os %}<button type="button" class="opt" data-os="{{ o }}"><b>{{ o }}</b></button>{% endfor %}
+        </div></div>
+      <div class="glass box"><h3>3 · LOCATION</h3>
+        <div class="cols">
+          {% for r in vps_regions %}<button type="button" class="opt" data-region="{{ r }}"><b>{{ r }}</b></button>{% endfor %}
+        </div></div>
+      <div class="glass box"><h3>4 · YOUR DETAILS</h3>
+        <div class="stack">
+          <div id="msg" class="alert hidden"></div>
+          <input id="f_name" class="field" placeholder="Full name" value="{{ session.get('user','') if session.get('user') else '' }}">
+          <input id="f_email" class="field" type="email" placeholder="Email address">
+          <input id="f_phone" class="field" placeholder="Phone / WhatsApp / Telegram username">
+          <select id="f_cycle" class="field"><option value="1">Billing: monthly</option><option value="3">Billing: every 3 months (save 5%)</option><option value="12">Billing: yearly (save 15%)</option></select>
+          <input id="f_note" class="field" placeholder="Notes (optional)">
+        </div></div>
+    </div>
+
+    <aside class="glass box sum tilt">
+      <h3>ORDER SUMMARY</h3>
+      <div class="row"><span>Plan</span><b id="s_plan">-</b></div>
+      <div class="row"><span>System</span><b id="s_os">-</b></div>
+      <div class="row"><span>Location</span><b id="s_region">-</b></div>
+      <div class="row"><span>Billing</span><b id="s_cycle">Monthly</b></div>
+      <div class="total grad" id="s_total">$0</div>
+      <button class="btn btn-p block" id="submitBtn" type="button"><i class="fas fa-server"></i> Register VPS</button>
+      <p style="font-size:.74rem;color:var(--mute);margin:14px 0 0;line-height:1.6">No payment is taken online. Your request is sent to our team and you will be contacted to finish activation.</p>
+    </aside>
+  </div>
+
+  {% if my_orders %}
+  <div class="my glass box"><h3>YOUR VPS REQUESTS</h3>
+    <div style="overflow-x:auto"><table>
+      <tr><th>ID</th><th>Plan</th><th>OS</th><th>Region</th><th>Total</th><th>Status</th></tr>
+      {% for o in my_orders %}<tr><td class="mono">{{ o.id }}</td><td>{{ o.plan_name }}</td><td>{{ o.os }}</td><td>{{ o.region }}</td><td>${{ o.total }}</td><td><span class="badge">{{ o.status }}</span></td></tr>
+      {% if o.status == 'Active' and (o.ip or o.ssh_pass) %}
+      <tr><td colspan="6" style="padding:0 12px 14px"><div class="mono" style="background:rgba(5,3,20,.7);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:.8rem;line-height:1.9;color:#c9c4ff">
+        <span style="color:var(--mute)">IP</span> {{ o.ip }} &nbsp;·&nbsp; <span style="color:var(--mute)">USER</span> {{ o.ssh_user }} &nbsp;·&nbsp; <span style="color:var(--mute)">PASS</span> {{ o.ssh_pass }}{% if o.expires %} &nbsp;·&nbsp; <span style="color:var(--mute)">EXPIRES</span> {{ o.expires }}{% endif %}<br>
+        <span style="color:var(--c)">ssh {{ o.ssh_user }}@{{ o.ip }}</span></div></td></tr>
+      {% endif %}{% endfor %}
+    </table></div></div>
+  {% endif %}
+</main>
+<footer class="f">© 2026 AMOR HOSTING</footer>
+<script>window.SCENE_MODE='auth';</script>
+<script>window.VPS_LOGGED={{ 'true' if session.get('user') else 'false' }};</script>
+{% include '_assist.html' %}
+{% include '_scripts.html' %}
+<script>
+var sel={plan:null,os:null,region:null},cycles={'1':[1,'Monthly',1],'3':[3,'Every 3 months',.95],'12':[12,'Yearly',.85]};
+function pick(attr,key){
+  document.querySelectorAll('['+attr+']').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('['+attr+']').forEach(function(x){x.classList.remove('on')});
+      b.classList.add('on'); sel[key]=b; refresh();
+    });
+  });
+}
+pick('data-plan','plan');pick('data-os','os');pick('data-region','region');
+function refresh(){
+  var c=cycles[document.getElementById('f_cycle').value];
+  document.getElementById('s_plan').textContent=sel.plan?sel.plan.dataset.name:'-';
+  document.getElementById('s_os').textContent=sel.os?sel.os.dataset.os:'-';
+  document.getElementById('s_region').textContent=sel.region?sel.region.dataset.region:'-';
+  document.getElementById('s_cycle').textContent=c[1];
+  var t=sel.plan?Math.round(parseFloat(sel.plan.dataset.price)*c[0]*c[2]*100)/100:0;
+  document.getElementById('s_total').textContent='$'+t;
+  if(window.applyLang)applyLang();
+}
+document.getElementById('f_cycle').addEventListener('change',refresh);
+function msg(t,ok){var m=document.getElementById('msg');m.className='alert '+(ok?'ok':'err');m.textContent=window.T?T(t):t;m.classList.remove('hidden');m.scrollIntoView({behavior:'smooth',block:'center'});}
+document.getElementById('submitBtn').addEventListener('click',async function(){
+  if(!window.VPS_LOGGED) return msg(t('Please sign in to order a VPS.'),false);
+  if(!sel.plan||!sel.os||!sel.region) return msg(t('Please choose a plan, an operating system and a location.'),false);
+  var body={plan:sel.plan.dataset.plan,os:sel.os.dataset.os,region:sel.region.dataset.region,cycle:document.getElementById('f_cycle').value,
+    name:document.getElementById('f_name').value.trim(),email:document.getElementById('f_email').value.trim(),
+    contact:document.getElementById('f_phone').value.trim(),note:document.getElementById('f_note').value.trim()};
+  if(!body.name||!body.email||!body.contact) return msg(t('Please fill in your name, email and contact.'),false);
+  this.disabled=true;
+  try{
+    var r=await fetch('/api/vps/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    var d=await r.json();
+    if(d.ok){msg('✔ '+d.order_id+' · $'+d.total,true);setTimeout(function(){location.href='/vps/panel'},1800);}
+    else{msg(d.error||t('Something went wrong.'),false);this.disabled=false;}
+  }catch(e){msg(t('Could not reach the server'),false);this.disabled=false;}
+});
+// preselect from ?plan=
+var q=new URLSearchParams(location.search).get('plan'); var pb=q&&document.querySelector('[data-plan="'+q+'"]'); if(pb)pb.click();
+var first=document.querySelector('[data-os]'); if(first)first.click(); var fr=document.querySelector('[data-region]'); if(fr)fr.click();
+</script>
+</body>
+</html>

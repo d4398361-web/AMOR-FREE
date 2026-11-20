@@ -1,0 +1,65 @@
+{
+    "admin": {
+        "password": "AMOR#2025",
+        "role": "admin"
+    },
+    "Amor": {
+        "password": "5432112345",
+        "role": "user",
+        "email": "amamorff123@gmail.com",
+        "phone": "",
+        "servers": [
+            {
+                "server_id": "v79bc942",
+                "kind": "vps",
+                "vps_id": "VPS-XYF25Z",
+                "type": "python",
+                "ram": "1GB",
+                "disk": "10GB",
+                "status": "stopped",
+                "pid": null,
+                "created": "2026-11-18 22:27:44.531599",
+                "expiry": "",
+                "main_file": "main.py",
+                "requirements_file": "requirements.txt",
+                "cpu_limit": 80,
+                "rate_limit_exceeded": false,
+                "stopped_by_user": false,
+                "port": 9195,
+                "public_url": "http://127.0.0.1:26160/s/v79bc942/",
+                "started_at": "2026-11-19 07:39:39.647152"
+            }
+        ],
+        "vps_only": true,
+        "oauth": "password"
+    },
+    "N": {
+        "password": "n",
+        "role": "user",
+        "servers": [
+            {
+                "server_id": "25118087",
+                "link": "25118087",
+                "login_url": "/25118087/login",
+                "dashboard_url": "/25118087/home",
+                "full_link": "http://127.0.0.1:26160/25118087/home",
+                "type": "python",
+                "ram": "512MB",
+                "disk": "1GB",
+                "status": "stopped",
+                "pid": null,
+                "created": "2026-11-18 22:37:14.296358",
+                "expiry": "2026-12-18 22:37:14.013980",
+                "main_file": "main.py",
+                "requirements_file": "requirements.txt",
+                "cpu_limit": 100,
+                "rate_limit_exceeded": false,
+                "stopped_by_user": false,
+                "port": 7627,
+                "public_url": "http://127.0.0.1:26160/s/25118087/"
+            }
+        ],
+        "email": "",
+        "phone": ""
+    }
+}

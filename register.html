@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Create account | AMOR HOSTING</title>
+{% include '_head.html' %}
+</head>
+<body class="amor">
+{% include '_nav.html' %}
+<main class="auth">
+  <div class="glass card tilt" style="max-width:480px">
+    <h1 data-i18n="reg_title">Create your <span class="grad">account</span></h1>
+    <p class="sub">Your hosting server is ready the moment you join.</p>
+    {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+    <div id="phoneMsg" class="alert hidden" style="text-align:center;white-space:pre-line"></div>
+
+    <div class="tabs">
+      <button type="button" id="tabPhone" class="tab" onclick="showTab('phone')"><i class="fas fa-mobile-screen"></i> Phone number</button>
+      <button type="button" id="tabMail" class="tab" onclick="showTab('mail')"><i class="fas fa-envelope"></i> Email</button>
+    </div>
+
+    <div id="panelPhone" class="stack">
+      <p data-i18n="reg_steps" style="font-size:.78rem;color:var(--mute);line-height:1.7;margin:0">
+        1) Open <a href="https://t.me/AmorffBOT" target="_blank" style="color:var(--c);font-weight:700">@AmorffBOT</a> and press <b>/start</b><br>
+        2) Send <code class="mono" style="color:var(--g)">/bind 01xxxxxxxxx</code><br>
+        3) Enter the same number below. Your code arrives in the bot.
+      </p>
+      <input type="tel" id="otpPhone" class="field" placeholder="01xxxxxxxxx" dir="ltr">
+      <button type="button" onclick="sendOtp()" class="btn btn-g block"><i class="fas fa-paper-plane"></i> Send verification code</button>
+      <input type="text" id="otpCode" class="field mono" style="text-align:center;letter-spacing:.4em" placeholder="000000" maxlength="6" dir="ltr" inputmode="numeric">
+      <input type="text" id="otpUsername" class="field" placeholder="Username (optional)" autocomplete="username">
+      <input type="password" id="otpPassword" class="field" placeholder="Password (min 4 characters)" autocomplete="new-password">
+      <button type="button" onclick="verifyOtp()" class="btn btn-p block"><i class="fas fa-user-plus"></i> Create account</button>
+    </div>
+
+    <div id="panelMail" class="hidden">
+      <form method="POST" class="stack">
+        <input type="email" name="email" required class="field" placeholder="Email address" autocomplete="email">
+        <input type="text" name="username" class="field" placeholder="Username (optional)" autocomplete="username">
+        <input type="password" name="password" required minlength="4" class="field" placeholder="Password (min 4 characters)" autocomplete="new-password">
+        <input type="hidden" name="phone" value="">
+        <button type="submit" class="btn btn-p block"><i class="fas fa-user-plus"></i> Create account</button>
+      </form>
+      <div class="or">OR</div>
+      <a href="/auth/google" class="gbtn"><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continue with Google</a>
+    </div>
+
+    <div class="or">HAVE AN ACCOUNT?</div>
+    <a href="/login" class="btn btn-g block"><i class="fas fa-right-to-bracket"></i> Sign in</a>
+  </div>
+</main>
+<script>window.SCENE_MODE='auth';</script>
+{% include '_scripts.html' %}
+<script>
+function showTab(t){
+  var phone=t==='phone';
+  document.getElementById('panelPhone').classList.toggle('hidden',!phone);
+  document.getElementById('panelMail').classList.toggle('hidden',phone);
+  document.getElementById('tabPhone').className='tab'+(phone?' on':'');
+  document.getElementById('tabMail').className='tab'+(!phone?' on':'');
+}
+showTab({{ 'true' if error else 'false' }} ? 'mail' : 'phone');
+function showMsg(text,ok){
+  var el=document.getElementById('phoneMsg');
+  el.className='alert '+(ok?'ok':'err'); el.textContent=text||''; el.classList.toggle('hidden',!text);
+}
+async function sendOtp(){
+  var phone=document.getElementById('otpPhone').value.trim();
+  if(!phone) return showMsg(t('Enter your phone number'),false);
+  try{
+    var r=await fetch('/api/phone/send_otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:phone,purpose:'register'})});
+    var d=await r.json(); showMsg(d.msg||d.error||'',!!d.ok);
+  }catch(e){showMsg(t('Could not reach the server'),false);}
+}
+async function verifyOtp(){
+  var phone=document.getElementById('otpPhone').value.trim(),code=document.getElementById('otpCode').value.trim(),
+      password=document.getElementById('otpPassword').value.trim(),username=document.getElementById('otpUsername').value.trim();
+  if(!phone||!code) return showMsg(t('Enter your phone and the code'),false);
+  if(password.length<4) return showMsg(t('Password must be at least 4 characters'),false);
+  try{
+    var r=await fetch('/api/phone/verify_otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:phone,code:code,password:password,username:username})});
+    var d=await r.json();
+    if(d.ok&&d.redirect){showMsg(t('Account created ✔'),true);location.href=d.redirect;} else showMsg(d.error||'Failed',false);
+  }catch(e){showMsg('Could not reach the server',false);}
+}
+</script>
+</body>
+</html>

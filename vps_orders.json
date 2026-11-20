@@ -1,0 +1,24 @@
+[
+  {
+    "id": "VPS-XYF25Z",
+    "user": "Amor",
+    "name": "Amor",
+    "email": "amamorff123@gmail.com",
+    "contact": "201116825958",
+    "plan": "nova",
+    "plan_name": "Nova",
+    "os": "Ubuntu 24.04",
+    "region": "Frankfurt",
+    "months": 1,
+    "total": 5.0,
+    "note": "Amor",
+    "status": "Active",
+    "created": "2026-11-18 22:18:36.652976",
+    "ip": "N",
+    "ssh_user": "root",
+    "ssh_pass": "qsLHjrQSf6tFQxbh",
+    "hostname": "",
+    "expires": "2026-12-18",
+    "workspace": "v79bc942"
+  }
+]

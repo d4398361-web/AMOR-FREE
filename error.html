@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | AMOR HOSTING</title>
+    <link rel="icon" type="image/jpeg" href="/static/favicon.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Sora', sans-serif; }
+        body { background: #05070f; }
+        .error-card {
+            background: rgba(15, 18, 30, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="error-card rounded-3xl p-10 w-full max-w-md text-center">
+        
+        {% if error_type == "expired" %}
+        <div class="w-20 h-20 bg-amber-500/15 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-amber-500/40">
+            <i class="fas fa-hourglass-end text-4xl text-amber-400"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-amber-400 mb-2">Server expired</h1>
+        <p class="text-gray-400 mb-2">Your server subscription has ended.</p>
+        <p class="text-gray-500 text-sm">Contact the admin to renew.</p>
+        
+        {% elif error_type == "deleted" %}
+        <div class="w-20 h-20 bg-red-500/15 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-red-500/40">
+            <i class="fas fa-trash-alt text-4xl text-red-400"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-red-400 mb-2">Server not found</h1>
+        <p class="text-gray-400 mb-2">This server has been deleted.</p>
+        <p class="text-gray-500 text-sm">Contact the admin for details.</p>
+        
+        {% else %}
+        <div class="w-20 h-20 bg-gray-500/15 rounded-2xl flex items-center justify-center mx-auto mb-5 border border-gray-500/40">
+            <i class="fas fa-exclamation-circle text-4xl text-gray-400"></i>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-300 mb-2">Something went wrong</h1>
+        <p class="text-gray-500">Please try again later.</p>
+        {% endif %}
+        
+        <a href="https://t.me/coa_d" target="_blank" 
+           class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold py-3 px-8 rounded-xl transition transform hover:scale-105 mt-8 shadow-lg shadow-blue-500/30">
+            <i class="fab fa-telegram-plane"></i> Contact the admin
+        </a>
+    </div>
+</body>
+</html>

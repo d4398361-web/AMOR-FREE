@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Create VPS account | AMOR HOSTING</title>
+{% include '_head.html' %}
+</head>
+<body class="amor">
+{% include '_nav.html' %}
+<main class="auth">
+  <div class="glass card tilt">
+    <h1>VPS <span class="grad">account</span></h1>
+    <p class="sub">Create an account to order and manage your servers. No hosting plan required.</p>
+    {% if error %}<div class="alert err">{{ error }}</div>{% endif %}
+    <form method="POST" class="stack">
+      <input class="field" type="email" name="email" required placeholder="Email address" autocomplete="email">
+      <input class="field" type="text" name="username" placeholder="Username (optional)" autocomplete="username">
+      <input class="field" type="password" name="password" required minlength="6" placeholder="Password (min 6 characters)" autocomplete="new-password">
+      <button class="btn btn-p block" type="submit"><i class="fas fa-server"></i> Create account &amp; continue</button>
+    </form>
+    <div class="or">HAVE AN ACCOUNT?</div>
+    <a href="/login" class="btn btn-g block"><i class="fas fa-right-to-bracket"></i> Sign in</a>
+  </div>
+</main>
+<script>window.SCENE_MODE='auth';</script>
+{% include '_scripts.html' %}
+</body>
+</html>

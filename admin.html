@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة الأدمن | AMOR HOSTING</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Cairo', sans-serif; }
+        body { background: #05070f; color: #fff; }
+        .glass { background: rgba(15, 18, 30, 0.8); backdrop-filter: blur(12px); }
+        .gradient-border { border: 1px solid rgba(59, 130, 246, 0.25); }
+        .hover-glow:hover { box-shadow: 0 0 25px rgba(59, 130, 246, 0.2); }
+        input[type="range"] {
+            -webkit-appearance: none; height: 8px; border-radius: 4px;
+            background: linear-gradient(to left, #10b981, #f59e0b, #ef4444); outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+            background: #3b82f6; cursor: pointer; border: 2px solid white;
+        }
+        .ad-banner-preview {
+            background: linear-gradient(90deg, #1e3a8a, #4c1d95, #1e3a8a);
+            background-size: 200% 100%;
+            animation: shimmer 4s linear infinite;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+</head>
+<body>
+
+    <header class="bg-[#0a0c14] border-b border-[#1a1f2e] px-6 py-4 flex justify-between items-center sticky top-0 z-20 backdrop-blur-md">
+        <a href="/admin/vps" style="position:fixed;bottom:18px;left:18px;z-index:60;background:linear-gradient(120deg,#6d28d9,#22d3ee);color:#fff;font-weight:700;padding:11px 18px;border-radius:14px;text-decoration:none;box-shadow:0 10px 30px rgba(109,40,217,.5);font-size:.85rem">&#128421; VPS Accounts</a>
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <i class="fas fa-shield-alt text-white"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-black">AMOR <span class="text-blue-400">HOSTING</span></h1>
+                <p class="text-xs text-gray-500">لوحة التحكم الإدارية</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="text-sm text-gray-400 bg-[#12151f] px-3 py-1.5 rounded-full"><i class="fas fa-user-shield ml-1"></i> Admin</span>
+            <a href="/logout" class="text-red-400 hover:text-red-300 bg-red-500/10 px-3 py-1.5 rounded-full text-sm transition">
+                <i class="fas fa-sign-out-alt"></i> خروج
+            </a>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-6 max-w-7xl">
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-[#0f121a] rounded-2xl gradient-border p-5 hover-glow transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">المستخدمين</p>
+                        <p class="text-3xl font-black" id="totalUsers">{{ users|length if users else 0 }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-500/15 rounded-xl flex items-center justify-center"><i class="fas fa-users text-xl text-blue-400"></i></div>
+                </div>
+            </div>
+            <div class="bg-[#0f121a] rounded-2xl border border-emerald-500/20 p-5 hover-glow transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">السيرفرات</p>
+                        <p class="text-3xl font-black" id="totalServers">{{ total_servers | default(0) }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-500/15 rounded-xl flex items-center justify-center"><i class="fas fa-server text-xl text-emerald-400"></i></div>
+                </div>
+            </div>
+            <div class="bg-[#0f121a] rounded-2xl border border-amber-500/20 p-5 hover-glow transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">يعمل الآن</p>
+                        <p class="text-3xl font-black text-amber-400" id="totalRunning">{{ total_running | default(0) }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-500/15 rounded-xl flex items-center justify-center"><i class="fas fa-play-circle text-xl text-amber-400"></i></div>
+                </div>
+            </div>
+            <div class="bg-[#0f121a] rounded-2xl border border-purple-500/20 p-5 hover-glow transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">طلبات معلقة</p>
+                        <p class="text-3xl font-black text-purple-400">{{ pending_count | default(0) }}</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-500/15 rounded-xl flex items-center justify-center"><i class="fas fa-clock text-xl text-purple-400"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ad Control -->
+        <div class="bg-[#0f121a] rounded-2xl gradient-border p-6 mb-8 hover-glow transition">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-bullhorn text-pink-400"></i> شريط الإعلان</h2>
+            <div class="grid md:grid-cols-3 gap-4 items-end">
+                <div class="md:col-span-2">
+                    <label class="block text-xs text-gray-500 mb-1">نص الإعلان</label>
+                    <input type="text" id="adTextInput" value="{{ ad_text | default('') }}" placeholder="اكتب نص الإعلان الذي سيظهر في أعلى الموقع..."
+                        class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="saveAd(true)" class="flex-1 bg-emerald-600 hover:bg-emerald-500 py-2.5 rounded-xl text-sm font-bold transition"><i class="fas fa-check ml-1"></i> تفعيل</button>
+                    <button onclick="saveAd(false)" class="flex-1 bg-gray-700 hover:bg-gray-600 py-2.5 rounded-xl text-sm font-bold transition"><i class="fas fa-times ml-1"></i> إيقاف</button>
+                </div>
+            </div>
+            <div class="mt-4 ad-banner-preview rounded-xl py-2.5 text-center text-sm text-white/90" id="adPreview">
+                <i class="fas fa-bullhorn ml-2"></i> <span id="adPreviewText">{{ ad_text | default('معاينة الإعلان...') }}</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-2"><i class="fas fa-info-circle ml-1"></i> يمكنك أيضاً تحديث الإعلان من بوت التيليجرام لاحقاً</p>
+        </div>
+
+        <!-- Create Server -->
+        <div class="bg-[#0f121a] rounded-2xl gradient-border p-6 mb-8 hover-glow transition">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-plus-circle text-blue-400"></i> إنشاء سيرفر جديد</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="createForm">
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">اسم المستخدم *</label>
+                    <input type="text" id="newUsername" placeholder="username" class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">كلمة المرور *</label>
+                    <input type="text" id="newPassword" placeholder="password" class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">البريد الإلكتروني (اختياري)</label>
+                    <input type="email" id="newEmail" placeholder="user@email.com" class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none" dir="ltr">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">رقم الهاتف (اختياري)</label>
+                    <input type="tel" id="newPhone" placeholder="01xxxxxxxxx" class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none" dir="ltr">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">نوع السيرفر</label>
+                    <select id="serverType" class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none">
+                        <option value="python">🐍 Python Bot</option>
+                        <option value="node">💚 Node.js</option>
+                        <option value="static">📄 Static Website</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">RAM</label>
+                    <select id="ram" class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none">
+                        <option value="128MB">128 MB</option>
+                        <option value="256MB">256 MB</option>
+                        <option value="512MB" selected>512 MB</option>
+                        <option value="1GB">1 GB</option>
+                        <option value="2GB">2 GB</option>
+                        <option value="4GB">4 GB</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">المساحة</label>
+                    <select id="disk" class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none">
+                        <option value="512MB">512 MB</option>
+                        <option value="1GB" selected>1 GB</option>
+                        <option value="2GB">2 GB</option>
+                        <option value="5GB">5 GB</option>
+                        <option value="10GB">10 GB</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-500 mb-1">الصلاحية (أيام)</label>
+                    <input type="number" id="expiryDays" value="30" min="1" max="365" class="w-full bg-[#07090e] border border-[#1a1f2e] rounded-xl px-4 py-2.5 text-sm focus:border-blue-500 outline-none">
+                </div>
+                <div class="md:col-span-3">
+                    <label class="block text-xs text-gray-500 mb-2 flex items-center gap-2">
+                        <i class="fas fa-tachometer-alt text-blue-400"></i> حد CPU: <span id="cpuLimitValue" class="text-blue-400 font-bold">80%</span>
+                    </label>
+                    <div class="flex items-center gap-4">
+                        <input type="range" id="cpuLimit" min="10" max="100" value="80" class="w-full" oninput="document.getElementById('cpuLimitValue').innerText = this.value + '%'">
+                        <div class="flex gap-2">
+                            <button onclick="setQuickCPU(30)" class="bg-emerald-600/20 hover:bg-emerald-600 px-2.5 py-1 rounded text-xs text-emerald-400">30%</button>
+                            <button onclick="setQuickCPU(50)" class="bg-amber-600/20 hover:bg-amber-600 px-2.5 py-1 rounded text-xs text-amber-400">50%</button>
+                            <button onclick="setQuickCPU(80)" class="bg-blue-600/20 hover:bg-blue-600 px-2.5 py-1 rounded text-xs text-blue-400">80%</button>
+                            <button onclick="setQuickCPU(100)" class="bg-red-600/20 hover:bg-red-600 px-2.5 py-1 rounded text-xs text-red-400">100%</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5 flex flex-wrap gap-2">
+                <span class="text-xs text-gray-500 flex items-center ml-2"><i class="fas fa-bolt ml-1"></i> قوالب سريعة:</span>
+                <button onclick="quickTemplate('discord')" class="bg-indigo-600/20 hover:bg-indigo-600/40 px-3 py-1.5 rounded-xl text-xs border border-indigo-500/30">🤖 Discord Bot</button>
+                <button onclick="quickTemplate('telegram')" class="bg-blue-600/20 hover:bg-blue-600/40 px-3 py-1.5 rounded-xl text-xs border border-blue-500/30">📨 Telegram Bot</button>
+                <button onclick="quickTemplate('flask')" class="bg-emerald-600/20 hover:bg-emerald-600/40 px-3 py-1.5 rounded-xl text-xs border border-emerald-500/30">🌐 Flask App</button>
+                <button onclick="quickTemplate('node')" class="bg-amber-600/20 hover:bg-amber-600/40 px-3 py-1.5 rounded-xl text-xs border border-amber-500/30">💚 Node.js</button>
+            </div>
+
+            <button onclick="createServer()" class="mt-5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 px-7 py-2.5 rounded-xl font-bold transition transform hover:scale-105 flex items-center gap-2 shadow-lg shadow-blue-500/30">
+                <i class="fas fa-check"></i> إنشاء السيرفر
+            </button>
+        </div>
+
+        <!-- Pending Google Approvals -->
+        <div class="bg-[#0f121a] rounded-2xl gradient-border p-6 mb-8 hover-glow transition" id="pendingSection">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-user-clock text-purple-400"></i> طلبات جوجل المعلقة</h2>
+            <div id="pendingList" class="space-y-3">
+                {% if pending_users %}
+                    {% for p in pending_users %}
+                    <div class="flex items-center justify-between bg-[#07090e] rounded-xl p-4 border border-[#1a1f2e]">
+                        <div>
+                            <p class="font-medium">{{ p.email }}</p>
+                            <p class="text-xs text-gray-500">{{ p.created_at }}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="approveUser('{{ p.id }}')" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 px-4 py-1.5 rounded-lg text-xs transition">موافقة</button>
+                            <button onclick="rejectUser('{{ p.id }}')" class="bg-red-600/20 hover:bg-red-600 text-red-400 px-4 py-1.5 rounded-lg text-xs transition">رفض</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-gray-500 text-sm text-center py-4">لا توجد طلبات معلقة حالياً</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="bg-[#0f121a] rounded-2xl gradient-border overflow-hidden">
+            <div class="p-5 border-b border-[#1a1f2e] flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-bold"><i class="fas fa-list ml-2"></i> قائمة المستخدمين والسيرفرات</h2>
+                    <p class="text-gray-500 text-xs mt-1">إدارة كاملة</p>
+                </div>
+                <button onclick="location.reload()" class="bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded-xl text-xs transition"><i class="fas fa-sync-alt ml-1"></i> تحديث</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-[#07090e]">
+                        <tr class="text-right text-gray-500 text-sm">
+                            <th class="p-4">المستخدم</th>
+                            <th class="p-4">كلمة المرور</th>
+                            <th class="p-4">رابط السيرفر</th>
+                            <th class="p-4">الإعدادات</th>
+                            <th class="p-4">حد CPU</th>
+                            <th class="p-4">الحالة</th>
+                            <th class="p-4">الانتهاء</th>
+                            <th class="p-4">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if not users or users|length == 0 %}
+                        <tr><td colspan="8" class="p-10 text-center text-gray-500"><i class="fas fa-inbox text-3xl mb-3 block opacity-30"></i>لا يوجد مستخدمين بعد</td></tr>
+                        {% else %}
+                            {% for user in users %}
+                                {% for server in user.servers %}
+                                <tr class="border-b border-[#1a1f2e] hover:bg-[#12151f] transition">
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                                                <span class="text-xs font-bold text-blue-400">{{ user.username[0] | upper }}</span>
+                                            </div>
+                                            <span class="font-mono text-sm">{{ user.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-gray-400 text-sm font-mono" id="pass-{{ server.server_id }}">••••••••</span>
+                                            <button onclick="togglePassword('{{ server.server_id }}', '{{ user.password }}')" class="text-gray-500 hover:text-gray-300 text-xs"><i class="fas fa-eye"></i></button>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        <a href="{{ server.login_url }}" target="_blank" class="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1">
+                                            <i class="fas fa-external-link-alt text-xs"></i> {{ server.server_id[:12] }}...
+                                        </a>
+                                    </td>
+                                    <td class="p-4 text-xs">
+                                        <span class="bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded-full">{{ server.type }}</span>
+                                        <span class="text-gray-600 mx-1">|</span>
+                                        <span class="text-gray-400">{{ server.ram }}</span>
+                                        <span class="text-gray-600 mx-1">|</span>
+                                        <span class="text-gray-400">{{ server.disk }}</span>
+                                    </td>
+                                    <td class="p-4">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-14 bg-gray-800 rounded-full h-2 overflow-hidden">
+                                                <div class="h-full rounded-full" style="width: {{ server.cpu_limit | default(80) }}%; background: {% if server.cpu_limit|default(80) <= 30 %}#10b981{% elif server.cpu_limit|default(80) <= 60 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+                                            </div>
+                                            <span class="text-xs font-bold">{{ server.cpu_limit | default(80) }}%</span>
+                                        </div>
+                                    </td>
+                                    <td class="p-4">
+                                        {% if server.status == 'running' %}
+                                        <span class="px-2.5 py-1 rounded-full text-xs bg-emerald-500/15 text-emerald-400"><i class="fas fa-circle text-[6px] ml-1"></i> يعمل</span>
+                                        {% else %}
+                                        <span class="px-2.5 py-1 rounded-full text-xs bg-red-500/15 text-red-400"><i class="fas fa-circle text-[6px] ml-1"></i> متوقف</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="p-4"><span class="text-amber-400 text-xs"><i class="far fa-calendar-alt ml-1"></i>{{ server.expiry[:10] if server.expiry else 'N/A' }}</span></td>
+                                    <td class="p-4">
+                                        <div class="flex gap-2">
+                                            <button onclick="changeCPULimit('{{ server.server_id }}', {{ server.cpu_limit | default(80) }})" class="text-blue-400 hover:text-blue-300 bg-blue-500/10 px-2 py-1 rounded transition text-sm" title="تغيير حد CPU"><i class="fas fa-tachometer-alt"></i></button>
+                                            <button onclick="deleteServer('{{ user.username }}', '{{ server.server_id }}')" class="text-red-400 hover:text-red-300 bg-red-500/10 px-2 py-1 rounded transition text-sm" title="حذف"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setQuickCPU(v) {
+            document.getElementById('cpuLimit').value = v;
+            document.getElementById('cpuLimitValue').innerText = v + '%';
+        }
+
+        function quickTemplate(type) {
+            document.getElementById('serverType').value = 'python';
+            if (type === 'discord') {
+                document.getElementById('newUsername').value = 'discord_' + Math.random().toString(36).substr(2, 5);
+                document.getElementById('ram').value = '256MB';
+                setQuickCPU(50);
+            } else if (type === 'telegram') {
+                document.getElementById('newUsername').value = 'tg_' + Math.random().toString(36).substr(2, 5);
+                document.getElementById('ram').value = '128MB';
+                setQuickCPU(30);
+            } else if (type === 'flask') {
+                document.getElementById('newUsername').value = 'flask_' + Math.random().toString(36).substr(2, 5);
+                document.getElementById('ram').value = '512MB';
+                setQuickCPU(80);
+            } else if (type === 'node') {
+                document.getElementById('serverType').value = 'node';
+                document.getElementById('newUsername').value = 'node_' + Math.random().toString(36).substr(2, 5);
+                document.getElementById('ram').value = '256MB';
+                setQuickCPU(60);
+            }
+            document.getElementById('newPassword').value = generatePassword();
+        }
+
+        function generatePassword() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+            let p = '';
+            for (let i = 0; i < 12; i++) p += chars.charAt(Math.floor(Math.random() * chars.length));
+            return p;
+        }
+
+        function togglePassword(id, pass) {
+            const el = document.getElementById('pass-' + id);
+            el.innerText = el.innerText === '••••••••' ? pass : '••••••••';
+        }
+
+        function saveAd(active) {
+            const text = document.getElementById('adTextInput').value.trim();
+            fetch('/admin/set_ad', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({text, active})
+            }).then(r => r.json()).then(d => {
+                if (d.success) {
+                    document.getElementById('adPreviewText').textContent = text || 'معاينة الإعلان...';
+                    Swal.fire({title: active ? 'تم التفعيل!' : 'تم الإيقاف', icon: 'success', background: '#0f121a', color: '#fff', timer: 1500, showConfirmButton: false});
+                }
+            });
+        }
+
+        document.getElementById('adTextInput').addEventListener('input', function() {
+            document.getElementById('adPreviewText').textContent = this.value || 'معاينة الإعلان...';
+        });
+
+        function changeCPULimit(serverId, current) {
+            Swal.fire({
+                title: 'تغيير حد CPU',
+                text: `الحالي: ${current}%`,
+                input: 'range',
+                inputAttributes: {min: '10', max: '100', step: '5'},
+                inputValue: current,
+                background: '#0f121a', color: '#fff',
+                confirmButtonColor: '#3b82f6', showCancelButton: true,
+                didOpen: () => {
+                    const range = Swal.getInput();
+                    const disp = document.createElement('span');
+                    disp.style.cssText = 'display:block;text-align:center;font-size:1.8em;font-weight:bold;color:#3b82f6;margin-top:10px;';
+                    disp.textContent = range.value + '%';
+                    range.parentNode.insertBefore(disp, range.nextSibling);
+                    range.addEventListener('input', () => disp.textContent = range.value + '%');
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/set_rate_limit/${serverId}`, {
+                        method: 'POST', headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({cpu_limit: parseInt(result.value)})
+                    }).then(r => r.json()).then(d => {
+                        if (d.success) {
+                            Swal.fire({title: 'تم!', html: `حد CPU أصبح <strong>${result.value}%</strong>`, icon: 'success', background: '#0f121a', color: '#fff'});
+                            setTimeout(() => location.reload(), 1000);
+                        }
+                    });
+                }
+            });
+        }
+
+        function createServer() {
+            const data = {
+                username: document.getElementById('newUsername').value.trim(),
+                password: document.getElementById('newPassword').value.trim(),
+                email: (document.getElementById('newEmail')||{}).value?.trim() || '',
+                phone: (document.getElementById('newPhone')||{}).value?.trim() || '',
+                server_type: document.getElementById('serverType').value,
+                ram: document.getElementById('ram').value,
+                disk: document.getElementById('disk').value,
+                expiry_days: parseInt(document.getElementById('expiryDays').value) || 30,
+                cpu_limit: parseInt(document.getElementById('cpuLimit').value) || 80
+            };
+            if (!data.username || !data.password) {
+                Swal.fire({title: 'خطأ', text: 'اسم المستخدم وكلمة المرور مطلوبان', icon: 'error', background: '#0f121a', color: '#fff'});
+                return;
+            }
+            Swal.fire({title: 'جاري الإنشاء...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background: '#0f121a', color: '#fff'});
+            fetch('/admin/create_server', {
+                method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+            }).then(r => r.json()).then(d => {
+                if (d.success) {
+                    Swal.fire({
+                        title: '🎉 تم الإنشاء!',
+                        html: `<div class="text-right space-y-1 text-sm">
+                            <p><strong>المستخدم:</strong> ${d.username}</p>
+                            <p><strong>كلمة المرور:</strong> ${d.password}</p>
+                            <p><strong>حد CPU:</strong> ${d.cpu_limit || 80}%</p>
+                            <p><strong>الرابط:</strong> <a href="${d.login_url}" target="_blank" class="text-blue-400">${d.login_url}</a></p>
+                        </div>`,
+                        icon: 'success', background: '#0f121a', color: '#fff', confirmButtonColor: '#3b82f6'
+                    });
+                    setTimeout(() => location.reload(), 2500);
+                } else {
+                    Swal.fire('خطأ', d.error || 'حدث خطأ', 'error');
+                }
+            }).catch(() => Swal.fire('خطأ', 'فشل الاتصال', 'error'));
+        }
+
+        function deleteServer(username, serverId) {
+            Swal.fire({
+                title: 'حذف السيرفر؟',
+                html: `<p>المستخدم: <strong class="text-red-400">${username}</strong></p>
+                       <p class="text-xs text-yellow-400 mt-2">⚠️ سيتم حذف كل الملفات ولا يمكن التراجع!</p>`,
+                icon: 'warning', background: '#0f121a', color: '#fff',
+                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#374151',
+                confirmButtonText: 'نعم، احذف'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/delete_server/${username}/${serverId}`, {method: 'POST'}).then(() => {
+                        Swal.fire({title: 'تم الحذف', icon: 'success', background: '#0f121a', color: '#fff'});
+                        setTimeout(() => location.reload(), 1000);
+                    });
+                }
+            });
+        }
+
+        function approveUser(id) {
+            fetch(`/admin/approve/${id}`, {method: 'POST'}).then(r => r.json()).then(d => {
+                if (d.success) { Swal.fire({title: 'تمت الموافقة', icon: 'success', background: '#0f121a', color: '#fff', timer: 1200, showConfirmButton: false}); setTimeout(() => location.reload(), 1200); }
+            });
+        }
+
+        function rejectUser(id) {
+            fetch(`/admin/reject/${id}`, {method: 'POST'}).then(r => r.json()).then(d => {
+                if (d.success) { Swal.fire({title: 'تم الرفض', icon: 'info', background: '#0f121a', color: '#fff', timer: 1200, showConfirmButton: false}); setTimeout(() => location.reload(), 1200); }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>AMOR HOSTING | Deploy anything. Instantly.</title>
+{% include '_head.html' %}
+<style>
+.hero{min-height:calc(100vh - 66px);display:flex;align-items:center;padding:40px 5vw}
+.hero .in{max-width:640px}
+.hero h1{font-size:clamp(2.6rem,7vw,5rem);line-height:1.02;margin:18px 0 18px;font-weight:800;letter-spacing:-.03em}
+.hero p{color:var(--mute);font-size:1.08rem;line-height:1.7;max-width:540px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.stats{display:flex;gap:34px;margin-top:44px;flex-wrap:wrap}
+.stats b{display:block;font-size:1.6rem}.stats span{font-size:.75rem;color:var(--mute);letter-spacing:.1em;text-transform:uppercase}
+.term{padding:0;overflow:hidden;max-width:620px;margin:0 auto}
+.term .bar{display:flex;gap:7px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.term .bar i{width:11px;height:11px;border-radius:50%}
+.term pre{margin:0;padding:20px 22px;font:.84rem/1.85 'JetBrains Mono',monospace;color:#c9c4ff;white-space:pre-wrap}
+.term .ok{color:var(--g)}.term .cy{color:var(--c)}.term .pk{color:var(--p)}
+.langs{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.plans{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.plan{padding:30px 26px;position:relative}
+.plan.hot{border-color:var(--c);box-shadow:0 0 70px rgba(34,211,238,.22)}
+.plan .tag{position:absolute;top:-12px;right:20px;background:linear-gradient(120deg,var(--v),var(--c));padding:4px 12px;border-radius:99px;font-size:.7rem;font-weight:700}
+.plan h3{margin:0;font-size:1.15rem}.plan .pr{font-size:2.3rem;font-weight:800;margin:10px 0}.plan .pr small{font-size:.85rem;color:var(--mute);font-weight:400}
+.plan ul{list-style:none;padding:0;margin:0 0 22px;color:var(--mute);font-size:.88rem}
+.plan li{padding:7px 0;border-bottom:1px dashed rgba(139,92,246,.15)}.plan li i{color:var(--c);margin-right:9px}
+.step{padding:26px}.step .n{font:800 2.6rem 'Sora';opacity:.35}
+.final{text-align:center;padding:60px 30px;margin:0 5vw 70px;max-width:1100px;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body class="amor">
+{% include '_nav.html' %}
+<main>
+  <header class="hero" style="position:relative">
+    <div class="in">
+      <span class="pill"><span class="dot"></span> All systems operational</span>
+      <h1 data-i18n="hero_title">Deploy <span class="grad">anything.</span><br>Instantly.</h1>
+      <p>Upload any website or project with all its files. AMOR detects the main file, installs what it needs and launches it automatically. Need more power? Grab your own VPS.</p>
+      <div class="cta">
+        <a href="/register" class="btn btn-p"><i class="fas fa-rocket"></i> Start hosting free</a>
+        <a href="/vps" class="btn btn-g"><i class="fas fa-server"></i> Explore VPS</a>
+      </div>
+      <div class="stats">
+        <div><b class="grad">99.9%</b><span>Uptime</span></div>
+        <div><b class="grad">&lt; 10s</b><span>Deploy time</span></div>
+        <div><b class="grad">1 GB</b><span>Upload limit</span></div>
+      </div>
+    </div>
+    <div class="scrollhint"></div>
+  </header>
+
+  <div class="marq"><div class="tr">
+    {% for k in range(2) %}<span><b>&gt;</b>HTML</span><span><b>&gt;</b>Python</span><span><b>&gt;</b>Flask</span><span><b>&gt;</b>Node.js</span><span><b>&gt;</b>Express</span><span><b>&gt;</b>PHP</span><span><b>&gt;</b>Discord bots</span><span><b>&gt;</b>Telegram bots</span><span><b>&gt;</b>VPS</span><span><b>&gt;</b>NVMe</span><span><b>&gt;</b>Root access</span>{% endfor %}
+  </div></div>
+
+  <section class="s" id="features">
+    <div class="reveal"><div class="eyebrow">Features</div><h2 class="t" data-i18n="feat_title">Everything a host should be.<br><span class="grad">Nothing it shouldn't.</span></h2></div>
+    <div class="grid g3" style="margin-top:34px">
+      <div class="glass fcard tilt reveal"><div class="ic"><i class="fas fa-wand-magic-sparkles"></i></div><h3>Auto-detect &amp; auto-run</h3><p>Drop a folder or ZIP. We find the entry file (index.html, main.py, app.py, server.js, package.json…) and start it for you.</p></div>
+      <div class="glass fcard tilt reveal"><div class="ic"><i class="fas fa-code"></i></div><h3>Every language</h3><p>Static sites, Python, Node.js, PHP and shell projects. Dependencies are installed automatically.</p></div>
+      <div class="glass fcard tilt reveal"><div class="ic"><i class="fas fa-link"></i></div><h3>Live URL instantly</h3><p>Every project gets its own public link the second it is uploaded. Share it right away.</p></div>
+      <div class="glass fcard tilt reveal"><div class="ic"><i class="fas fa-terminal"></i></div><h3>Live console</h3><p>Real-time logs, start / stop / restart and a built-in file manager with editor.</p></div>
+      <div class="glass fcard tilt reveal"><div class="ic"><i class="fas fa-shield-halved"></i></div><h3>Isolated &amp; protected</h3><p>CPU limits, private source files and rate limiting keep every project safe.</p></div>
+      <div class="glass fcard tilt reveal"><div class="ic"><i class="fas fa-server"></i></div><h3>Dedicated VPS</h3><p>Full root access, NVMe storage and your choice of OS. Order in under a minute.</p></div>
+    </div>
+  </section>
+
+  <section class="s" id="how">
+    <div class="reveal"><div class="eyebrow">How it works</div><h2 class="t" data-i18n="how_title">Three steps to <span class="grad">live.</span></h2></div>
+    <div class="grid g3" style="margin-top:34px;align-items:start">
+      <div class="glass step tilt reveal"><div class="n grad">01</div><h3>Create account</h3><p class="lead" style="font-size:.9rem">Sign up with phone, email or Google. Your server is created for you.</p></div>
+      <div class="glass step tilt reveal"><div class="n grad">02</div><h3>Drop your files</h3><p class="lead" style="font-size:.9rem">Upload a whole folder or a ZIP. Nothing to configure.</p></div>
+      <div class="glass step tilt reveal"><div class="n grad">03</div><h3>Go live</h3><p class="lead" style="font-size:.9rem">The main file is detected and started automatically. Copy your link.</p></div>
+    </div>
+    <div class="glass term reveal" style="margin-top:40px">
+      <div class="bar"><i style="background:#f43f5e"></i><i style="background:#fbbf24"></i><i style="background:#34d399"></i></div>
+<pre><span class="cy">$</span> amor deploy ./my-project.zip
+<span class="pk">›</span> extracting 128 files ...
+<span class="pk">›</span> detected project type: <span class="ok">Node.js</span>  entry: <span class="ok">server.js</span>
+<span class="pk">›</span> npm install ... done
+<span class="pk">›</span> starting process ...
+<span class="ok">✔ Live at https://your-host/s/a1b2c3d4/</span></pre>
+    </div>
+    <div class="langs reveal"><span class="pill">HTML / CSS / JS</span><span class="pill">Python</span><span class="pill">Node.js</span><span class="pill">PHP</span><span class="pill">Flask</span><span class="pill">Express</span><span class="pill">Discord / Telegram bots</span></div>
+  </section>
+
+  <section class="s" id="vps">
+    <div class="reveal"><div class="eyebrow">VPS</div><h2 class="t" data-i18n="vps_title">Your own server. <span class="grad">Full root.</span></h2><p class="lead">Pick a plan and register your VPS request in under a minute.</p></div>
+    <div class="grid plans" style="margin-top:36px">
+      {% for p in vps_plans %}
+      <div class="glass plan tilt reveal {{ 'hot' if p.hot else '' }}">
+        {% if p.hot %}<div class="tag">MOST POPULAR</div>{% endif %}
+        <h3>{{ p.name }}</h3>
+        <div class="pr">${{ p.price }}<small> / month</small></div>
+        <ul>
+          <li><i class="fas fa-microchip"></i>{{ p.cpu }} vCPU</li>
+          <li><i class="fas fa-memory"></i>{{ p.ram }} GB RAM</li>
+          <li><i class="fas fa-hard-drive"></i>{{ p.disk }} GB NVMe</li>
+          <li><i class="fas fa-gauge-high"></i>{{ p.bw }} bandwidth</li>
+        </ul>
+        <a href="/vps?plan={{ p.id }}#order" class="btn {{ 'btn-p' if p.hot else 'btn-g' }} block">Choose {{ p.name }}</a>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="s" id="faq">
+    <div class="reveal"><div class="eyebrow">FAQ</div><h2 class="t">Questions, answered.</h2></div>
+    <div class="faq reveal">
+      <details class="glass"><summary>Which languages can I host?</summary><p>Static HTML, Python (Flask, bots), Node.js, PHP and shell scripts. Dependencies install automatically.</p></details>
+      <details class="glass"><summary>How does auto-detect work?</summary><p>We look for package.json, app.py / main.py, index.php or index.html, pick the right runtime and start it for you.</p></details>
+      <details class="glass"><summary>How do I get my VPS?</summary><p>Register a request on the VPS page. Our team activates it and your server details appear in your account.</p></details>
+      <details class="glass"><summary>Is there a free plan?</summary><p>Yes. Every new account comes with a free hosting server to try.</p></details>
+    </div>
+  </section>
+
+  <div class="glass final reveal">
+    <h2 class="t" style="margin-top:0" data-i18n="cta_title">Ready to <span class="grad">launch?</span></h2>
+    <p class="lead" style="margin:0 auto 26px">Create your account and have your project online before your coffee cools.</p>
+    <a href="/register" class="btn btn-p"><i class="fas fa-rocket"></i> Create free account</a>
+  </div>
+</main>
+<footer class="f">© 2026 AMOR HOSTING · Built for builders</footer>
+<script>window.SCENE_MODE='hero';</script>
+{% include '_assist.html' %}
+{% include '_scripts.html' %}
+</body>
+</html>

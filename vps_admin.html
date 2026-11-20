@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>VPS Control · AMOR</title>
+<link rel="icon" type="image/jpeg" href="/static/favicon.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{--bg:#0b0d0c;--p1:#111513;--p2:#171c19;--ln:#232b26;--tx:#e8efe9;--mu:#7d8a82;--am:#f5a524;--gr:#2ee6a6;--rd:#ff5d6c;--bl:#4aa8ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 'Inter',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace}
+a{color:inherit;text-decoration:none}
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(700px 400px at 50% 0,rgba(245,165,36,.12),transparent 70%)}
+.lbox{width:100%;max-width:380px;background:var(--p1);border:1px solid var(--ln);border-radius:18px;padding:32px}
+.lbox h1{margin:0 0 4px;font-size:1.25rem}.lbox p{margin:0 0 22px;color:var(--mu);font-size:.85rem}
+.in,select.in{width:100%;background:#0b0d0c;border:1px solid var(--ln);border-radius:10px;padding:11px 13px;color:var(--tx);font:inherit}
+.in:focus{outline:none;border-color:var(--am)}
+.b{border:0;border-radius:10px;padding:10px 16px;font:600 .85rem 'Inter';cursor:pointer;color:#111;background:var(--am);transition:.15s}
+.b:hover{filter:brightness(1.1)}.b.g{background:var(--p2);color:var(--tx);border:1px solid var(--ln)}.b.r{background:var(--rd);color:#fff}.b.gr{background:var(--gr)}
+.err{color:var(--rd);font-size:.82rem;margin-bottom:12px}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.side{background:var(--p1);border-right:1px solid var(--ln);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;padding:4px 10px 22px}
+.logo i{color:var(--am);font-size:1.2rem}
+.logo small{display:block;color:var(--mu);font-weight:500;font-size:.7rem;letter-spacing:.12em}
+.nv{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:var(--mu);cursor:pointer;margin-bottom:3px;font-weight:500}
+.nv:hover{background:var(--p2);color:var(--tx)}.nv.on{background:rgba(245,165,36,.12);color:var(--am)}
+.nv .c{margin-inline-start:auto;background:var(--am);color:#111;border-radius:99px;font-size:.68rem;font-weight:700;padding:1px 8px}
+.main{padding:28px 34px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;gap:12px;flex-wrap:wrap}
+.top h2{margin:0;font-size:1.4rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
+.stat{background:var(--p1);border:1px solid var(--ln);border-radius:14px;padding:16px 18px}
+.stat span{color:var(--mu);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em}.stat b{display:block;font-size:1.7rem;margin-top:4px}
+.card{background:var(--p1);border:1px solid var(--ln);border-radius:16px;overflow:hidden}
+table{width:100%;border-collapse:collapse}th,td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--ln);font-size:.84rem;white-space:nowrap}
+th{color:var(--mu);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;background:var(--p2)}
+tr:hover td{background:rgba(255,255,255,.015)}
+.tag{padding:3px 10px;border-radius:99px;font-size:.7rem;font-weight:700}
+.tag.Pending{background:rgba(245,165,36,.15);color:var(--am)}.tag.Active{background:rgba(46,230,166,.15);color:var(--gr)}
+.tag.Suspended{background:rgba(255,93,108,.15);color:var(--rd)}.tag.Cancelled{background:rgba(125,138,130,.18);color:var(--mu)}
+.scroll{overflow-x:auto}
+.filters{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:99px;border:1px solid var(--ln);background:var(--p1);cursor:pointer;color:var(--mu);font-size:.78rem;font-weight:600}.chip.on{border-color:var(--am);color:var(--am)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;place-items:center;z-index:50;padding:16px}.modal.open{display:grid}
+.mb{background:var(--p1);border:1px solid var(--ln);border-radius:18px;width:100%;max-width:620px;max-height:92vh;overflow:auto;padding:26px}
+.mb h3{margin:0 0 4px}.mb .sub{color:var(--mu);font-size:.8rem;margin-bottom:18px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-size:.7rem;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin:0 0 5px}
+.row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--p2);border:1px solid var(--ln);border-left:3px solid var(--gr);padding:12px 18px;border-radius:10px;z-index:99;display:none}
+.pi{width:100%}.pl td{padding:6px 8px}.pl .in{padding:8px 10px}
+@media(max-width:860px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;gap:4px;padding:12px}.logo{padding:4px 8px}.main{padding:18px}.g2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="logo"><i class="fas fa-server"></i><div>VPS Console<small>{{ who }}</small></div></div>
+    <div class="nv on" data-t="inst"><i class="fas fa-list"></i> Orders <span class="c" id="cPend" style="display:none">0</span></div>
+    <div class="nv" data-t="cust"><i class="fas fa-users"></i> Customers</div>
+    <div class="nv" data-t="plans"><i class="fas fa-tags"></i> Plans &amp; pricing</div>
+    <div class="nv" data-t="set"><i class="fas fa-gear"></i> Settings</div>
+    <div style="margin-top:auto"><a class="nv" href="/vps"><i class="fas fa-arrow-up-right-from-square"></i> Public page</a><a class="nv" href="/vps-admin/logout"><i class="fas fa-right-from-bracket"></i> Sign out</a></div>
+  </aside>
+  <main class="main">
+    <div class="stats" id="stats"></div>
+
+    <section id="t-inst">
+      <div class="top"><h2>VPS orders</h2><div><button class="b g" onclick="load()"><i class="fas fa-rotate"></i> Refresh</button> <button class="b" onclick="openNew()"><i class="fas fa-plus"></i> New VPS for customer</button></div></div>
+      <div class="filters" id="filters"></div>
+      <div class="card scroll"><table><thead><tr><th>ID</th><th>Customer</th><th>Plan</th><th>OS / Region</th><th>Total</th><th>IP</th><th>Status</th><th>Request</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    </section>
+
+    <section id="t-cust" style="display:none">
+      <div class="top"><h2>Customers</h2></div>
+      <div class="card scroll"><table><thead><tr><th>Username</th><th>Email</th><th>Type</th><th>Orders</th><th>State</th><th></th></tr></thead><tbody id="custRows"></tbody></table></div>
+    </section>
+
+    <section id="t-plans" style="display:none">
+      <div class="top"><h2>Plans &amp; pricing</h2><div><button class="b g" onclick="addPlan()"><i class="fas fa-plus"></i> Add plan</button> <button class="b gr" onclick="savePlans()">Save plans</button></div></div>
+      <div class="card scroll"><table class="pl"><thead><tr><th>ID</th><th>Name</th><th>$/mo</th><th>vCPU</th><th>RAM</th><th>Disk</th><th>Bandwidth</th><th>Popular</th><th>On</th><th></th></tr></thead><tbody id="planRows"></tbody></table></div>
+    </section>
+
+    <section id="t-set" style="display:none">
+      <div class="top"><h2>Settings</h2></div>
+      <div class="card" style="padding:24px;max-width:560px;margin-bottom:18px">
+        <label>Operating systems (one per line)</label><textarea class="in" id="s_os" rows="5"></textarea>
+        <label style="margin-top:12px">Locations (one per line)</label><textarea class="in" id="s_reg" rows="5"></textarea>
+        <label style="margin-top:12px">Support email</label><input class="in" id="s_mail">
+        <div class="row"><button class="b gr" onclick="saveSettings()">Save settings</button></div>
+      </div>
+      <div class="card" style="padding:24px;max-width:560px">
+        <label>Current password</label><input class="in" type="password" id="pw_old" style="margin-bottom:10px">
+        <label>New password (8+ characters)</label><input class="in" type="password" id="pw_new" style="margin-bottom:12px">
+        <button class="b" onclick="savePw()">Change password</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="modal"><div class="mb">
+  <h3 id="mTitle">Manage</h3><div class="sub" id="mSub"></div>
+  <div class="g2" id="newOnly" style="display:none;margin-bottom:12px">
+    <div style="grid-column:1/-1"><label>Customer (username or email — new accounts are created automatically)</label><input class="in" id="n_cust"></div>
+    <div><label>Plan</label><select class="in" id="n_plan"></select></div>
+    <div><label>Months</label><input class="in" id="n_months" type="number" value="1" min="1"></div>
+    <div><label>OS</label><select class="in" id="n_os"></select></div>
+    <div><label>Location</label><select class="in" id="n_reg"></select></div>
+  </div>
+  <div class="g2">
+    <div><label>Status</label><select class="in" id="f_status"><option>Pending</option><option>Active</option><option>Suspended</option><option>Cancelled</option></select></div>
+    <div><label>Expires (YYYY-MM-DD)</label><input class="in mono" id="f_exp"></div>
+    <div><label>Hostname</label><input class="in" id="f_host"></div>
+    <div><label>IP address</label><input class="in mono" id="f_ip" placeholder="203.0.113.10"></div>
+    <div><label>SSH user</label><input class="in mono" id="f_user" value="root"></div>
+    <div><label>SSH password</label><div style="display:flex;gap:6px"><input class="in mono" id="f_pw"><button type="button" class="b g" onclick="genPw()"><i class="fas fa-wand-magic-sparkles"></i></button></div></div>
+    <div style="grid-column:1/-1"><label>Note</label><input class="in" id="f_note"></div>
+  </div>
+  <div id="mInfo" style="margin-top:14px;color:var(--mu);font-size:.8rem"></div>
+  <div class="row"><button class="b gr" onclick="saveInst()">Save</button><button class="b" id="actBtn" onclick="activate()">Activate</button><button class="b g" id="clrBtn" onclick="clearReq()">Clear request</button><button class="b r" id="delBtn" onclick="delInst()" style="margin-inline-start:auto">Delete</button><button class="b g" onclick="closeM()">Close</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+var CSRF="{{ csrf }}",DATA={orders:[],customers:[],plans:[],cfg:{os:[],regions:[]},stats:{counts:{}}},cur=null,filt='All',isNew=false;
+function $(i){return document.getElementById(i)}
+function toast(m,bad){var t=$('toast');t.textContent=m;t.style.borderLeftColor=bad?'var(--rd)':'var(--gr)';t.style.display='block';setTimeout(function(){t.style.display='none'},3000)}
+async function api(url,body){var o={method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json','X-CSRF':CSRF}};if(body!==undefined)o.body=JSON.stringify(body);
+  var r=await fetch(url,o);if(r.status===403&&url.indexOf('/state')>0){location.href='/vps-admin';return {}}try{return await r.json()}catch(e){return {ok:false,error:'Server error'}}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+document.querySelectorAll('.nv[data-t]').forEach(function(n){n.onclick=function(){document.querySelectorAll('.nv[data-t]').forEach(function(x){x.classList.remove('on')});n.classList.add('on');
+  ['inst','plans','cust','set'].forEach(function(t){$('t-'+t).style.display=t===n.dataset.t?'block':'none'})}});
+async function load(){
+  var d=await api('/vps-admin/api/state');if(!d.ok)return;DATA=d;var s=d.stats,c=s.counts||{};
+  $('stats').innerHTML=[['Orders',s.orders],['Pending',c.Pending||0],['Active',c.Active||0],['Customers',s.customers],['MRR','$'+s.mrr]].map(function(x){return '<div class="stat"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>'}).join('');
+  var p=$('cPend');p.textContent=c.Pending||0;p.style.display=c.Pending?'inline':'none';
+  $('filters').innerHTML=['All','Pending','Active','Suspended','Cancelled'].map(function(f){return '<span class="chip'+(f===filt?' on':'')+'" onclick="setF(\''+f+'\')">'+f+'</span>'}).join('');
+  drawRows();drawPlans();drawCust();$('s_os').value=(d.cfg.os||[]).join('\n');$('s_reg').value=(d.cfg.regions||[]).join('\n');$('s_mail').value=d.cfg.support_email||'';
+}
+function setF(f){filt=f;drawRows();document.querySelectorAll('.chip').forEach(function(c){c.classList.toggle('on',c.textContent===f)})}
+function drawRows(){
+  var list=DATA.orders.filter(function(i){return filt==='All'||i.status===filt});
+  $('rows').innerHTML=list.map(function(i){return '<tr><td class="mono">'+esc(i.id)+'</td><td>'+esc(i.user||i.name)+'<br><span style="color:var(--mu);font-size:.75rem">'+esc(i.email)+'</span></td><td>'+esc(i.plan_name)+'</td><td>'+esc(i.os)+'<br><span style="color:var(--mu);font-size:.75rem">'+esc(i.region)+'</span></td><td>$'+esc(i.total)+' <span style="color:var(--mu)">/ '+esc(i.months)+'mo</span></td><td class="mono">'+esc(i.ip||'—')+'</td><td><span class="tag '+esc(i.status)+'">'+esc(i.status)+'</span></td><td>'+(i.request?'<span class="tag Pending">'+esc(i.request)+'</span>':'')+'</td><td><button class="b g" onclick="openM(\''+esc(i.id)+'\')">Manage</button></td></tr>'}).join('')||'<tr><td colspan="9" style="color:var(--mu);text-align:center;padding:30px">Nothing here yet</td></tr>';
+}
+function fillSel(id,arr,val){$(id).innerHTML=arr.map(function(x){return '<option value="'+esc(x.v)+'">'+esc(x.t)+'</option>'}).join('');if(val)$(id).value=val}
+function openM(id){isNew=false;cur=DATA.orders.find(function(i){return i.id===id});if(!cur)return;
+  $('newOnly').style.display='none';$('actBtn').style.display='';$('clrBtn').style.display=cur.request?'':'none';$('delBtn').style.display='';
+  $('mTitle').textContent=cur.plan_name+' · '+cur.id;$('mSub').textContent=cur.name+' · '+cur.email+' · '+cur.contact;
+  $('f_status').value=cur.status;$('f_exp').value=cur.expires||'';$('f_host').value=cur.hostname||'';$('f_ip').value=cur.ip||'';$('f_user').value=cur.ssh_user||'root';$('f_pw').value=cur.ssh_pass||'';$('f_note').value=cur.note||'';
+  $('mInfo').innerHTML=esc(cur.os)+' · '+esc(cur.region)+' · '+esc(cur.months)+' mo'+(cur.request?'<br><b style="color:var(--am)">Customer request: '+esc(cur.request)+'</b>':'');
+  $('modal').classList.add('open')}
+function openNew(){isNew=true;cur=null;$('newOnly').style.display='grid';$('actBtn').style.display='none';$('clrBtn').style.display='none';$('delBtn').style.display='none';
+  fillSel('n_plan',DATA.plans.filter(function(p){return p.enabled!==false}).map(function(p){return {v:p.id,t:p.name+' — $'+p.price}}));
+  fillSel('n_os',DATA.cfg.os.map(function(x){return {v:x,t:x}}));fillSel('n_reg',DATA.cfg.regions.map(function(x){return {v:x,t:x}}));
+  $('mTitle').textContent='New VPS for a customer';$('mSub').textContent='Creates the customer account too if it does not exist.';
+  $('f_status').value='Active';$('f_exp').value='';$('f_host').value='';$('f_ip').value='';$('f_user').value='root';$('f_pw').value='';$('f_note').value='';$('n_cust').value='';$('mInfo').textContent='';
+  $('modal').classList.add('open')}
+function closeM(){$('modal').classList.remove('open')}
+function genPw(){var c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789',p='',a=new Uint32Array(16);crypto.getRandomValues(a);a.forEach(function(v){p+=c[v%c.length]});$('f_pw').value=p}
+function fields(){return {status:$('f_status').value,expires:$('f_exp').value.trim(),hostname:$('f_host').value.trim(),ip:$('f_ip').value.trim(),ssh_user:$('f_user').value.trim()||'root',ssh_pass:$('f_pw').value,note:$('f_note').value}}
+async function saveInst(){
+  if(isNew){var b=fields();b.customer=$('n_cust').value.trim();b.plan=$('n_plan').value;b.os=$('n_os').value;b.region=$('n_reg').value;b.months=parseInt($('n_months').value)||1;
+    var r=await api('/api/vpsadmin/create',b);if(r.ok){toast(r.new_login_password?('Created. New customer password: '+r.new_login_password):'Created');if(r.new_login_password)prompt('Send this login to the customer ('+r.customer+'):',r.new_login_password);closeM();load()}else toast(r.error||'Error',true);return}
+  var d=await api('/api/vpsadmin/update/'+cur.id,fields());if(d.ok){toast('Saved');closeM();load()}else toast(d.error||'Error',true)}
+async function activate(){if(!$('f_ip').value.trim()){toast('Enter the IP address first',true);return}if(!$('f_pw').value)genPw();$('f_status').value='Active';if(!$('f_exp').value){var d=new Date();d.setDate(d.getDate()+30*(cur.months||1));$('f_exp').value=d.toISOString().slice(0,10)}await saveInst()}
+async function clearReq(){var b=fields();b.clear_request=true;var d=await api('/api/vpsadmin/update/'+cur.id,b);if(d.ok){toast('Request cleared');closeM();load()}}
+async function delInst(){if(!confirm('Delete this order permanently?'))return;var d=await api('/api/vpsadmin/delete/'+cur.id,{});if(d.ok){toast('Deleted');closeM();load()}else toast(d.error||'Error',true)}
+function drawPlans(){$('planRows').innerHTML=DATA.plans.map(function(p){return '<tr><td><input class="in mono" data-k="id" value="'+esc(p.id)+'"></td><td><input class="in" data-k="name" value="'+esc(p.name)+'"></td><td><input class="in" type="number" step="0.01" data-k="price" value="'+esc(p.price)+'"></td><td><input class="in" type="number" data-k="cpu" value="'+esc(p.cpu)+'"></td><td><input class="in" type="number" data-k="ram" value="'+esc(p.ram)+'"></td><td><input class="in" type="number" data-k="disk" value="'+esc(p.disk)+'"></td><td><input class="in" data-k="bw" value="'+esc(p.bw)+'"></td><td><input type="checkbox" data-k="hot" '+(p.hot?'checked':'')+'></td><td><input type="checkbox" data-k="enabled" '+(p.enabled!==false?'checked':'')+'></td><td><button class="b r" onclick="this.closest(\'tr\').remove()"><i class="fas fa-trash"></i></button></td></tr>'}).join('')}
+function readPlans(){return Array.prototype.map.call(document.querySelectorAll('#planRows tr'),function(tr){var o={};tr.querySelectorAll('[data-k]').forEach(function(e){o[e.dataset.k]=e.type==='checkbox'?e.checked:e.value});return o})}
+function addPlan(){DATA.plans=readPlans();DATA.plans.push({id:'plan'+(DATA.plans.length+1),name:'New',price:10,cpu:1,ram:2,disk:40,bw:'2 TB',hot:false,enabled:true});drawPlans()}
+async function savePlans(){var d=await api('/vps-admin/api/plans',{plans:readPlans()});if(d.ok){toast('Plans saved');load()}else toast(d.error||'Error',true)}
+function drawCust(){$('custRows').innerHTML=DATA.customers.map(function(c){return '<tr><td>'+esc(c.username)+'</td><td>'+esc(c.email)+'</td><td>'+(c.vps_only?'VPS only':'Hosting + VPS')+'</td><td>'+c.orders+'</td><td>'+(c.suspended?'<span class="tag Suspended">Suspended</span>':'<span class="tag Active">OK</span>')+'</td><td><button class="b g" onclick="cust(\''+esc(c.username)+'\',\'toggle\')">'+(c.suspended?'Unsuspend':'Suspend')+'</button> <button class="b g" onclick="cust(\''+esc(c.username)+'\',\'reset\')">Reset password</button> <button class="b r" onclick="cust(\''+esc(c.username)+'\',\'delete\')">Delete</button></td></tr>'}).join('')||'<tr><td colspan="6" style="color:var(--mu);text-align:center;padding:30px">No customers yet</td></tr>'}
+async function cust(u,a){if(a==='delete'&&!confirm('Delete customer '+u+'?'))return;var d=await api('/vps-admin/api/customer',{username:u,action:a});if(d.ok){if(d.password)prompt('New password for '+u+':',d.password);else toast('Done');load()}else toast(d.error||'Error',true)}
+async function saveSettings(){var L=function(id){return $(id).value.split('\n').map(function(x){return x.trim()}).filter(Boolean)};var d=await api('/vps-admin/api/settings',{os:L('s_os'),regions:L('s_reg'),support_email:$('s_mail').value});if(d.ok){toast('Settings saved');load()}else toast(d.error||'Error',true)}
+async function savePw(){var d=await api('/vps-admin/api/password',{old:$('pw_old').value,new:$('pw_new').value});if(d.ok){toast('Password changed');$('pw_old').value=$('pw_new').value=''}else toast(d.error||'Error',true)}
+load();setInterval(function(){if(!$('modal').classList.contains('open')&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName))load()},30000);
+</script>
+</body>
+</html>
