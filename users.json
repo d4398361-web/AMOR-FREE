@@ -26,8 +26,7 @@
                 "rate_limit_exceeded": false,
                 "stopped_by_user": false,
                 "port": 9195,
-                "public_url": "http://127.0.0.1:26160/s/v79bc942/",
-                "started_at": "2026-11-19 07:39:39.647152"
+                "public_url": "http://127.0.0.1:26160/s/v79bc942/"
             }
         ],
         "vps_only": true,
